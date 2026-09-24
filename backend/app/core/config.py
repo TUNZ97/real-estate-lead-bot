@@ -1,10 +1,19 @@
 from functools import lru_cache
+from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Prefer repo-root .env, then backend/.env
+_ROOT = Path(__file__).resolve().parents[3]  # .../backend/app/core → repo root
+_BACKEND = Path(__file__).resolve().parents[2]  # .../backend
+_ENV_FILES = [
+    str(_ROOT / ".env"),
+    str(_BACKEND / ".env"),
+]
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=_ENV_FILES,
         env_file_encoding="utf-8",
         extra="ignore",
     )
@@ -19,7 +28,9 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api/v1"
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
-    DATABASE_URL: str = "postgresql+psycopg://user:password@localhost:5432/primehomes_lead_bot"
+    DATABASE_URL: str = (
+        "postgresql+psycopg://primehomes:primehomes@localhost:5432/primehomes_lead_bot"
+    )
 
     JWT_SECRET: str = "change-me"
     JWT_ALGORITHM: str = "HS256"
