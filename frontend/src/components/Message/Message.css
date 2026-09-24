@@ -1,0 +1,32 @@
+.message {
+  display: flex;
+}
+
+.message--customer {
+  justify-content: flex-end;
+}
+
+.message--bot {
+  justify-content: flex-start;
+}
+
+.message__bubble {
+  max-width: 80%;
+  padding: 0.625rem 0.875rem;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.message--customer .message__bubble {
+  background: #0f3d2e;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.message--bot .message__bubble {
+  background: #eef2f0;
+  color: #1a1a1a;
+  border-bottom-left-radius: 4px;
+}
