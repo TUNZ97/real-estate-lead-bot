@@ -2,6 +2,8 @@
 
 Follow these steps on your machine to run the full chat path.
 
+**Stack:** npm (React + n8n) + Python (FastAPI) + MySQL on your PC (no Docker for development).
+
 ## Architecture in practice
 
 ```text
@@ -26,6 +28,7 @@ cp .env.example .env
 At minimum set:
 
 ```text
+DATABASE_URL=mysql+pymysql://root:YOUR_MYSQL_PASSWORD@localhost:3306/primehomes_lead_bot
 N8N_WEBHOOK_URL=http://localhost:5678/webhook/customer-message
 CORS_ORIGINS=http://localhost:5173
 VITE_API_BASE_URL=/api/v1
@@ -35,9 +38,18 @@ DEBUG=true
 
 Use the **exact** production webhook URL from your active n8n workflow.
 
+Create the MySQL database once (if it does not exist):
+
+```sql
+CREATE DATABASE IF NOT EXISTS primehomes_lead_bot
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+> Chat + n8n work **without** tables for now. MySQL is ready for Phase 1 migrations.
+
 ## 3. Start n8n + activate WF-001
 
-1. Start n8n (`n8n` or your existing instance).
+1. Start n8n: `npx n8n`
 2. Open the customer-message workflow.
 3. Webhook path should match the URL above (e.g. `customer-message`).
 4. **Respond to Webhook** must return JSON with a `response` string (see `n8n/workflows/WF-001-customer-message.README.md`).
@@ -72,7 +84,7 @@ Docs: http://localhost:8000/docs
 ```bash
 curl -s http://localhost:8000/api/v1/chat \
   -H "Content-Type: application/json" \
-  -d '{"message":"I need a 3-bed in Lekki under 80 million"}'
+  -d "{\"message\":\"I need a 3-bed in Lekki under 80 million\"}"
 ```
 
 - If n8n is active → you get the workflow’s `response`.
@@ -105,16 +117,17 @@ You should see the orange/yellow PrimeHomes chat UI. Send a message; the reply s
 | CORS error in browser | Ensure FastAPI is running and `CORS_ORIGINS` includes `http://localhost:5173` |
 | Network error on send | Backend not running, or `VITE_API_BASE_URL` wrong |
 | `response` missing | n8n Respond node must include JSON field `response` |
+| MySQL connection (later phases) | Service running? Password correct? DB created? Port 3306? |
 | Port 5678 vs production URL | After activating workflow, copy the **Production** webhook URL into `.env` |
 
 ## What’s already implemented in code
 
 - **Frontend:** modern orange/yellow chat, API client, conversation id, loading/error/retry
-- **Backend:** validation, n8n client, chat service, standard error format, CORS
+- **Backend:** validation, n8n client, chat service, standard error format, CORS, PyMySQL driver
 - **Docs:** this guide + `n8n/workflows/WF-001-customer-message.README.md`
 
-## Not required yet for this test
+## Not required yet for this chat test
 
-- PostgreSQL / migrations (Phase 1)
+- MySQL tables / migrations (Phase 1)
 - Full AI extraction inside n8n (you can add AI nodes next)
 - Sales UI
