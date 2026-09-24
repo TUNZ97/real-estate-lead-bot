@@ -1,15 +1,16 @@
 # Development Setup
 
+Local development uses **npm** (frontend + n8n), **Python/FastAPI** (backend), and **MySQL on your PC**. Docker is **not** required for day-to-day development.
+
 ## Prerequisites
 
 Install:
 
 - Git
-- Node.js (18+)
+- Node.js (18+) / npm
 - Python 3.11+
-- Docker (optional, for PostgreSQL via docker-compose)
-- PostgreSQL (or use Docker)
-- n8n
+- **MySQL** (already installed on your machine)
+- n8n (via npm: `npx n8n` or global install)
 - ngrok (only when external webhooks are needed)
 
 ## Repository
@@ -20,21 +21,37 @@ cd real-estate-lead-bot
 cp .env.example .env
 ```
 
-## PostgreSQL (Docker — recommended for local)
+Edit `.env` and set your real MySQL password and n8n webhook URL.
 
-```bash
-docker compose up -d
+## MySQL (local — no Docker)
+
+1. Start the MySQL service on your PC (Windows Services, or MySQL Workbench, or `mysql.server start` on macOS).
+
+2. Create the database (once):
+
+```sql
+CREATE DATABASE IF NOT EXISTS primehomes_lead_bot
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
 ```
 
-This starts PostgreSQL on port `5432` with credentials matching `.env.example`:
+You can run that in MySQL Workbench, phpMyAdmin, or the CLI:
 
-- user: `primehomes`
-- password: `primehomes`
-- database: `primehomes_lead_bot`
+```bash
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS primehomes_lead_bot CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+```
 
-Stop with: `docker compose down`
+3. Set `DATABASE_URL` in `.env`:
 
-## Frontend
+```text
+DATABASE_URL=mysql+pymysql://root:YOUR_PASSWORD@localhost:3306/primehomes_lead_bot
+```
+
+Replace `root` / `YOUR_PASSWORD` if you use another user.
+
+> Tables/migrations are Phase 1. Chat + n8n work **without** tables for now.
+
+## Frontend (npm)
 
 ```bash
 cd frontend
@@ -44,9 +61,7 @@ npm run dev
 
 App: http://localhost:5173
 
-## Backend
-
-Create and activate a virtual environment, then install dependencies.
+## Backend (Python)
 
 ```bash
 cd backend
@@ -67,24 +82,22 @@ source .venv/bin/activate
 
 ```bash
 pip install -r requirements.txt
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 - Health: http://localhost:8000/health
 - API docs: http://localhost:8000/docs
 
-## n8n
+## n8n (npm)
 
 ```bash
-n8n
-# or: npx n8n
+npx n8n
+# or, if installed globally: n8n
 ```
 
 UI: http://localhost:5678
 
-## ngrok
-
-When FastAPI/n8n needs to be reachable externally during local development:
+## ngrok (optional)
 
 ```bash
 ngrok http 5678
@@ -94,45 +107,42 @@ Do not hardcode a temporary ngrok hostname into source code.
 
 ## Environment variables
 
-Keep secrets in `.env` at the repo root.
+Keep secrets in `.env` at the repo root. See `.env.example`.
 
-`.env.example` lists names and safe placeholders only.
-
-Typical categories:
+Important keys:
 
 ```text
-DATABASE_URL
-API_BASE_URL
-N8N_BASE_URL
+DATABASE_URL          # mysql+pymysql://...
 N8N_WEBHOOK_URL
-AI_API_KEY
-JWT_SECRET
+CORS_ORIGINS
+VITE_API_BASE_URL     # prefer /api/v1 with Vite proxy
 ```
 
-## Local workflow
+## Local workflow (order)
 
-Run in this order:
-
-1. PostgreSQL (`docker compose up -d`)
-2. FastAPI (`uvicorn app.main:app --reload` from `backend/`)
-3. React (`npm run dev` from `frontend/`)
-4. n8n
+1. MySQL running on your PC
+2. n8n (`npx n8n`) — activate WF-001 webhook
+3. FastAPI (`uvicorn ...`)
+4. React (`npm run dev`)
 5. ngrok only when required
 
 ## Troubleshooting
 
+### MySQL connection fails
+
+- Is the MySQL service running?
+- Is the password in `DATABASE_URL` correct? (URL-encode special characters, e.g. `@` → `%40`)
+- Does the database `primehomes_lead_bot` exist?
+- Default port is `3306`
+
 ### CORS
 
-Verify frontend origin is allowed by FastAPI (`CORS_ORIGINS` in `.env`).
+Verify `CORS_ORIGINS` includes `http://localhost:5173`.
 
 ### n8n webhook unavailable
 
-Check n8n is running and `N8N_WEBHOOK_URL` is correct.
+Check n8n is running, workflow is **Active**, and `N8N_WEBHOOK_URL` matches the **Production** webhook URL.
 
 ### AI request fails
 
-Check provider credentials, model configuration, request payload, and rate limits.
-
-### Database connection fails
-
-Check PostgreSQL is running (`docker compose ps`) and `DATABASE_URL` matches.
+Check provider credentials, model, payload, and rate limits inside n8n.
