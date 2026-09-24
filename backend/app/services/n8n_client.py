@@ -96,7 +96,7 @@ class N8nClient:
                 message="n8n returned non-JSON response.",
                 status_code=502,
                 request_id=request_id,
-            ) from exp
+            ) from exc
 
         # Support both flat and { data: {...} } wrappers
         if isinstance(data, dict) and "data" in data and isinstance(data["data"], dict):
