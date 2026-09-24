@@ -1,56 +1,45 @@
-from fastapi import APIRouter, Header
-from pydantic import BaseModel, Field
 from typing import Optional
-import uuid
+from fastapi import APIRouter, Header
+
+from app.schemas.chat import ChatRequest, ChatResponse, ChatResponseData
+from app.services.chat_service import process_chat_message
 
 router = APIRouter()
 
 
-class ChatRequest(BaseModel):
-    message: str = Field(..., min_length=1, max_length=4000)
-    conversation_id: Optional[str] = None
-    customer_id: Optional[str] = None
-
-
-class ChatResponseData(BaseModel):
-    conversation_id: str
-    lead_id: Optional[str] = None
-    response: str
-    processing_status: str
-
-
-class ChatResponse(BaseModel):
-    data: ChatResponseData
-    meta: dict = {}
-
-
 @router.post("/chat", response_model=ChatResponse)
-def post_chat(
+async def post_chat(
     body: ChatRequest,
     x_request_id: Optional[str] = Header(default=None, alias="X-Request-ID"),
     idempotency_key: Optional[str] = Header(default=None, alias="Idempotency-Key"),
 ) -> ChatResponse:
     """
-    Receive a customer message and return a bot response.
+    Receive a customer message and return the bot response.
 
-    Phase 0/2 placeholder: returns a static acknowledgement.
-    Later phases will validate, call n8n, persist, and qualify.
+    Flow: validate → n8n WF-001 → return response.
+    In development, falls back to a safe message if n8n is offline.
     """
-    conversation_id = body.conversation_id or str(uuid.uuid4())
-    request_id = x_request_id or str(uuid.uuid4())
+    result = await process_chat_message(
+        message=body.message,
+        conversation_id=body.conversation_id,
+        customer_id=body.customer_id,
+        request_id=x_request_id,
+        idempotency_key=idempotency_key,
+    )
+
+    meta = {
+        "request_id": result.get("request_id"),
+        "idempotency_key": idempotency_key,
+    }
+    if result.get("n8n_error"):
+        meta["n8n_error"] = result["n8n_error"]
 
     return ChatResponse(
         data=ChatResponseData(
-            conversation_id=conversation_id,
-            lead_id=None,
-            response=(
-                "Thank you for your enquiry. Our lead system is being set up. "
-                "A real assistant response will appear here once AI and workflows are connected."
-            ),
-            processing_status="PLACEHOLDER",
+            conversation_id=result["conversation_id"],
+            lead_id=result.get("lead_id"),
+            response=result["response"],
+            processing_status=result["processing_status"],
         ),
-        meta={
-            "request_id": request_id,
-            "idempotency_key": idempotency_key,
-        },
+        meta=meta,
     )
