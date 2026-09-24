@@ -24,12 +24,14 @@ Principle: *AI provides intelligence; deterministic software provides control.*
 
 ```text
 real-estate-lead-bot/
-├── frontend/          # React (Vite) customer chat & sales views
-├── backend/           # FastAPI application
-├── n8n/               # n8n workflow exports & notes
-├── docs/              # Approved specifications (PRD, architecture, etc.)
-├── .env.example       # Environment variable template
-├── AGENTS.md          # Guidance for AI/coding agents
+├── frontend/              # React (Vite + TypeScript) customer chat & sales views
+├── backend/               # FastAPI application + Alembic
+├── n8n/                   # n8n workflow exports & notes
+├── docs/                  # Approved specifications (PRD, architecture, etc.)
+├── docker-compose.yml     # Local PostgreSQL
+├── .env.example           # Environment variable template
+├── .gitignore
+├── AGENTS.md              # Guidance for AI/coding agents
 └── README.md
 ```
 
@@ -37,17 +39,23 @@ real-estate-lead-bot/
 
 ### Prerequisites
 
-- Git, Node.js (18+), Python 3.11+, PostgreSQL, n8n, ngrok (optional)
+- Git, Node.js (18+), Python 3.11+, Docker (recommended), n8n, ngrok (optional)
 
-### 1. Clone
+### 1. Clone & configure
 
 ```bash
 git clone https://github.com/TUNZ97/real-estate-lead-bot.git
 cd real-estate-lead-bot
-cp .env.example .env   # then fill in values
+cp .env.example .env
 ```
 
-### 2. Backend
+### 2. PostgreSQL
+
+```bash
+docker compose up -d
+```
+
+### 3. Backend
 
 ```bash
 cd backend
@@ -58,7 +66,10 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-### 3. Frontend
+- Health: http://localhost:8000/health
+- Docs: http://localhost:8000/docs
+
+### 4. Frontend
 
 ```bash
 cd frontend
@@ -66,16 +77,14 @@ npm install
 npm run dev
 ```
 
-### 4. n8n
+App: http://localhost:5173
+
+### 5. n8n
 
 ```bash
 n8n
 # or: npx n8n
 ```
-
-### 5. PostgreSQL
-
-Ensure PostgreSQL is running and `DATABASE_URL` in `.env` is correct.
 
 ## Documentation
 
@@ -101,7 +110,7 @@ All approved specifications live in [`docs/`](./docs/):
 
 See [docs/IMPLEMENTATION.md](./docs/IMPLEMENTATION.md) for the full roadmap.
 
-0. Project foundation (this scaffolding)  
+0. **Project foundation** (complete)  
 1. Database & migrations  
 2. FastAPI core APIs  
 3. React chat UI  
