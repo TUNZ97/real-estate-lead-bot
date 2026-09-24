@@ -121,7 +121,7 @@ Manages system configuration and users.
 - Reliable processing.
 - Clear error handling.
 - Maintainable architecture.
-- PostgreSQL as production source of truth.
+- **MySQL** as the database source of truth for development (local install; Docker optional later for deployment).
 - Practical security.
 - Testable components.
 
