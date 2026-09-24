@@ -51,7 +51,7 @@ It should not invent the customer's name, phone, email, exact location, or prope
 
 ## Architecture
 
-React + FastAPI + n8n + AI + PostgreSQL.
+React + FastAPI + n8n + AI + **MySQL** (local development; Docker optional later for deployment).
 
 ## MVP objective
 
