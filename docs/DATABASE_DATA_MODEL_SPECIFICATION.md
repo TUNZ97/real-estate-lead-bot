@@ -2,9 +2,23 @@
 
 ## Database
 
-**Production:** PostgreSQL
+**Development:** MySQL (local install on the developer machine — no Docker required).
 
-**Prototype/demo:** Google Sheets may be used temporarily, but it is not the production source of truth.
+**Connection string format (SQLAlchemy + PyMySQL):**
+
+```text
+mysql+pymysql://USER:PASSWORD@HOST:PORT/DATABASE
+```
+
+Example:
+
+```text
+mysql+pymysql://root:your_password@localhost:3306/primehomes_lead_bot
+```
+
+**Character set:** `utf8mb4` (recommended for names and chat text).
+
+**Note:** Docker is optional and reserved for later deployment experiments. Local development uses the MySQL instance already on your PC.
 
 ## Core entities
 
@@ -129,7 +143,7 @@ Conversation
 
 ## Constraints
 
-- Foreign keys must be enforced.
+- Foreign keys must be enforced (InnoDB).
 - Required fields must be non-null.
 - Status transitions must be controlled.
 - Duplicate business records should be prevented where appropriate.
