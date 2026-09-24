@@ -1,0 +1,35 @@
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+*.pem
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+
+# Logs & coverage
+*.log
+coverage/
+.pytest_cache/
+.mypy_cache/
+
+# n8n local data (if stored under repo)
+.n8n/
