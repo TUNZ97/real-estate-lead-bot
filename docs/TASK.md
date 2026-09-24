@@ -26,6 +26,15 @@
 - [x] Chat service with **development fallback** if n8n is offline
 - [x] Request ID + Idempotency-Key headers supported
 
+## TASK-003b — Local MySQL (no Docker)
+
+**Status:** DONE
+
+- [x] `DATABASE_URL` uses `mysql+pymysql://...`
+- [x] `pymysql` in `requirements.txt` (psycopg removed)
+- [x] Docs updated (PRD, architecture, setup, deployment, etc.)
+- [x] `docker-compose.yml` removed for local development
+
 ## TASK-004 — Wire to your n8n workflow (on your machine)
 
 **Status:** READY FOR YOU
@@ -39,7 +48,7 @@
 
 | ID | Task | Phase |
 |----|------|-------|
-| TASK-005 | PostgreSQL models + Alembic migrations | 1 |
+| TASK-005 | **MySQL** models + Alembic migrations | 1 |
 | TASK-006 | Persist customers / leads / messages via FastAPI or n8n | 1–2 |
 | TASK-007 | Full WF-001 AI + qualification | 5–7 |
 | TASK-008 | Sales notification workflow | 8 |
@@ -49,3 +58,5 @@
 ```text
 React chat  →  POST /api/v1/chat (FastAPI)  →  n8n webhook (WF-001)  →  JSON response  →  chat bubble
 ```
+
+Database (Phase 1+): **MySQL on your PC** via `DATABASE_URL`.
