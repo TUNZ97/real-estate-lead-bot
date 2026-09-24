@@ -4,11 +4,14 @@
 
 Keep the MVP deployment simple. Do not introduce Kubernetes or microservices.
 
+**Development** uses MySQL installed on the developer PC (no Docker required).
+Docker may be introduced later only if useful for staging/production packaging.
+
 ## Components
 
 - React frontend
 - FastAPI backend
-- PostgreSQL database
+- **MySQL** database
 - n8n
 - AI provider
 
@@ -16,7 +19,7 @@ Keep the MVP deployment simple. Do not introduce Kubernetes or microservices.
 
 ### Development
 
-Local machine, optionally using ngrok for webhook access.
+Local machine: npm (frontend + n8n), Python (FastAPI), MySQL on PC. Optionally ngrok for webhook access.
 
 ### Staging
 
@@ -43,7 +46,7 @@ Never commit:
 Before release:
 
 1. backup existing production data when applicable
-2. run migrations
+2. run migrations (Alembic against MySQL)
 3. verify schema
 4. run smoke tests
 
@@ -60,7 +63,7 @@ Before release:
 Verify:
 
 - health endpoint
-- database connection
+- database connection (`DATABASE_URL` → MySQL)
 - migrations
 - environment configuration
 - API routes
