@@ -6,7 +6,7 @@ This file helps coding agents (and humans) work correctly on the PrimeHomes Real
 
 - **Product:** AI-assisted real estate lead intake & qualification system
 - **Company context:** PrimeHomes Realty (Nigeria-focused examples: Lekki, Ikeja, Ibadan, NGN)
-- **Stack:** React (Vite) + FastAPI + n8n + AI provider + PostgreSQL
+- **Stack:** React (Vite) + FastAPI + n8n + AI provider + **MySQL** (local PC for development)
 - **Principle:** AI provides intelligence; deterministic software provides control.
 
 ## Source of truth
@@ -19,17 +19,18 @@ When in doubt, follow the docs over assumptions.
 
 ## Architecture boundaries (do not violate)
 
-- React must **never** access PostgreSQL or hold secrets (DB credentials, AI keys, JWT secrets).
+- React must **never** access MySQL or hold secrets (DB credentials, AI keys, JWT secrets).
 - FastAPI owns: validation, auth boundary, application services, repository/DB access, custom business logic.
 - n8n owns: workflow orchestration, AI workflow execution, notifications, scheduled follow-ups, routing.
 - AI output is **untrusted** until validated. Never let LLM output bypass DB constraints or set final lead status.
 - Do **not** put all domain logic into n8n code nodes.
 - Do **not** introduce microservices, Kubernetes, multiple AI agents, or complex CRM integrations for the MVP.
+- Do **not** require Docker for local development; MySQL runs on the developer’s machine.
 
 ## Layering (backend)
 
 ```text
-API → Service → Repository → Database
+API → Service → Repository → Database (MySQL)
 ```
 
 Keep these layers distinct.
@@ -43,7 +44,7 @@ Build the **smallest useful vertical slice**, verify it, then expand.
 Recommended sequence:
 
 ```text
-Repository → React scaffold → FastAPI scaffold → Database → Basic API → Basic chat
+Repository → React scaffold → FastAPI scaffold → Database (MySQL) → Basic API → Basic chat
 → n8n → AI → Qualification → Sales → Follow-up → Testing → Release
 ```
 
@@ -62,7 +63,7 @@ Repository → React scaffold → FastAPI scaffold → Database → Basic API �
 
 - Python 3.11+
 - Type hints and Pydantic schemas for request/response.
-- SQLAlchemy (or equivalent) models + Alembic migrations.
+- SQLAlchemy + **PyMySQL** + Alembic migrations targeting MySQL.
 - Tests for validation, services, status transitions, and errors.
 
 ### Frontend (React)
@@ -71,10 +72,11 @@ Repository → React scaffold → FastAPI scaffold → Database → Basic API �
 - Components under `src/components/`, pages under `src/pages/`.
 - API client in `src/services/api/`.
 - Clear loading / error / retry states for chat.
-- Mobile-first chat UI.
+- Mobile-first chat UI (orange/yellow palette).
 
 ### n8n
 
+- Run via npm (`npx n8n`).
 - Export workflows as JSON into `n8n/workflows/` when possible.
 - Protect internal webhooks; no hardcoded secrets.
 - Retry only transient failures.
