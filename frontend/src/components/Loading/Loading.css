@@ -1,0 +1,37 @@
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.5rem;
+}
+
+.loading__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-orange-500);
+  animation: bounce 1.2s infinite ease-in-out;
+}
+
+.loading__dot:nth-child(2) {
+  animation-delay: 0.15s;
+  background: var(--color-yellow-500);
+}
+
+.loading__dot:nth-child(3) {
+  animation-delay: 0.3s;
+  background: var(--color-orange-600);
+}
+
+@keyframes bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.7);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
