@@ -5,18 +5,34 @@
 Install:
 
 - Git
-- Node.js
-- Python
-- PostgreSQL
+- Node.js (18+)
+- Python 3.11+
+- Docker (optional, for PostgreSQL via docker-compose)
+- PostgreSQL (or use Docker)
 - n8n
-- ngrok
+- ngrok (only when external webhooks are needed)
 
 ## Repository
 
 ```bash
 git clone https://github.com/TUNZ97/real-estate-lead-bot.git
 cd real-estate-lead-bot
+cp .env.example .env
 ```
+
+## PostgreSQL (Docker — recommended for local)
+
+```bash
+docker compose up -d
+```
+
+This starts PostgreSQL on port `5432` with credentials matching `.env.example`:
+
+- user: `primehomes`
+- password: `primehomes`
+- database: `primehomes_lead_bot`
+
+Stop with: `docker compose down`
 
 ## Frontend
 
@@ -26,11 +42,11 @@ npm install
 npm run dev
 ```
 
+App: http://localhost:5173
+
 ## Backend
 
 Create and activate a virtual environment, then install dependencies.
-
-Example:
 
 ```bash
 cd backend
@@ -43,23 +59,28 @@ Windows PowerShell:
 .venv\Scripts\Activate.ps1
 ```
 
-Install project dependencies from the backend requirements file.
-
-Start FastAPI with the project's configured command, commonly:
+Linux / macOS:
 
 ```bash
+source .venv/bin/activate
+```
+
+```bash
+pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
+- Health: http://localhost:8000/health
+- API docs: http://localhost:8000/docs
+
 ## n8n
-
-The project uses npm-based local n8n development.
-
-Example:
 
 ```bash
 n8n
+# or: npx n8n
 ```
+
+UI: http://localhost:5678
 
 ## ngrok
 
@@ -73,11 +94,11 @@ Do not hardcode a temporary ngrok hostname into source code.
 
 ## Environment variables
 
-Keep secrets in `.env`.
+Keep secrets in `.env` at the repo root.
 
-Provide `.env.example` with names only.
+`.env.example` lists names and safe placeholders only.
 
-Typical configuration categories:
+Typical categories:
 
 ```text
 DATABASE_URL
@@ -88,15 +109,13 @@ AI_API_KEY
 JWT_SECRET
 ```
 
-Use placeholder values in `.env.example`.
-
 ## Local workflow
 
-Run:
+Run in this order:
 
-1. PostgreSQL
-2. FastAPI
-3. React
+1. PostgreSQL (`docker compose up -d`)
+2. FastAPI (`uvicorn app.main:app --reload` from `backend/`)
+3. React (`npm run dev` from `frontend/`)
 4. n8n
 5. ngrok only when required
 
@@ -104,11 +123,11 @@ Run:
 
 ### CORS
 
-Verify frontend origin is allowed by FastAPI.
+Verify frontend origin is allowed by FastAPI (`CORS_ORIGINS` in `.env`).
 
 ### n8n webhook unavailable
 
-Check n8n is running and the webhook URL is correct.
+Check n8n is running and `N8N_WEBHOOK_URL` is correct.
 
 ### AI request fails
 
@@ -116,4 +135,4 @@ Check provider credentials, model configuration, request payload, and rate limit
 
 ### Database connection fails
 
-Check PostgreSQL is running and `DATABASE_URL` is correct.
+Check PostgreSQL is running (`docker compose ps`) and `DATABASE_URL` matches.
