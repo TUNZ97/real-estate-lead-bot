@@ -1,5 +1,5 @@
 const API_BASE =
-  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1'
+  import.meta.env.VITE_API_BASE_URL ?? '/api/v1'
 
 export interface ChatRequest {
   message: string
@@ -11,14 +11,14 @@ export interface ChatRequest {
 export interface ChatResponse {
   data: {
     conversation_id: string
-    lead_id?: string
+    lead_id?: string | null
     response: string
     processing_status: string
   }
   meta?: Record<string, unknown>
 }
 
-export interface ApiError {
+export interface ApiErrorBody {
   error: {
     code: string
     message: string
@@ -50,11 +50,18 @@ export async function sendChatMessage(
     }),
   })
 
-  const body = await res.json()
+  let body: unknown
+  try {
+    body = await res.json()
+  } catch {
+    throw new Error(`Request failed (${res.status})`)
+  }
 
   if (!res.ok) {
-    const err = body as ApiError
-    throw new Error(err?.error?.message ?? `Request failed (${res.status})`)
+    const err = body as ApiErrorBody
+    throw new Error(
+      err?.error?.message ?? `Request failed (${res.status})`,
+    )
   }
 
   return body as ChatResponse
