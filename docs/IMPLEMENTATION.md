@@ -4,6 +4,8 @@
 
 Build the smallest useful vertical slice, verify it, then expand.
 
+Local stack: **npm** (React + n8n) + **Python/FastAPI** + **MySQL on your PC**. No Docker required for development.
+
 ## Phase 0 — Project Foundation
 
 - repository
@@ -14,8 +16,8 @@ Build the smallest useful vertical slice, verify it, then expand.
 
 ## Phase 1 — Database
 
-- PostgreSQL
-- migrations
+- **MySQL** (local)
+- migrations (Alembic + PyMySQL)
 - customer
 - lead
 - property requirement
@@ -45,7 +47,7 @@ Build the smallest useful vertical slice, verify it, then expand.
 Get:
 
 ```text
-React → FastAPI → PostgreSQL → React
+React → FastAPI → MySQL → React
 ```
 
 working before introducing AI complexity.
@@ -101,7 +103,7 @@ working before introducing AI complexity.
 Repository
 → React
 → FastAPI
-→ Database
+→ Database (MySQL)
 → Basic API
 → Basic chat
 → n8n
