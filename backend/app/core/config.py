@@ -28,8 +28,9 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api/v1"
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
+    # Local MySQL (no Docker required for development)
     DATABASE_URL: str = (
-        "postgresql+psycopg://primehomes:primehomes@localhost:5432/primehomes_lead_bot"
+        "mysql+pymysql://root:password@localhost:3306/primehomes_lead_bot"
     )
 
     JWT_SECRET: str = "change-me"
