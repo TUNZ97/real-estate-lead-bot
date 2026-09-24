@@ -21,7 +21,7 @@ n8n
    ├── Notifications
    └── Follow-up Automation
    ↓
-PostgreSQL
+MySQL
    ↓
 Sales Team
 ```
@@ -38,7 +38,7 @@ Owns:
 - customer-facing interactions
 - sales UI when implemented
 
-React must not access PostgreSQL directly.
+React must not access MySQL directly.
 
 ### FastAPI
 
@@ -83,9 +83,9 @@ Owns:
 
 AI output is untrusted until validated.
 
-### PostgreSQL
+### MySQL
 
-Production source of truth for:
+Source of truth (local development on the developer PC; Docker optional later for deployment) for:
 
 - customers
 - leads
@@ -97,6 +97,8 @@ Production source of truth for:
 - follow-ups
 - notifications
 - history/audit records
+
+Connection via SQLAlchemy + PyMySQL (`mysql+pymysql://...`).
 
 ## 4. Lead lifecycle
 
