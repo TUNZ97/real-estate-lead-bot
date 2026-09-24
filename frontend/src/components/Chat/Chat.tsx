@@ -7,24 +7,33 @@ import './Chat.css'
 interface ChatProps {
   messages: Message[]
   status: ChatStatus
+  errorMessage?: string | null
   onSend: (text: string) => void
   onRetry?: () => void
 }
 
-export default function Chat({ messages, status, onSend, onRetry }: ChatProps) {
+export default function Chat({
+  messages,
+  status,
+  errorMessage,
+  onSend,
+  onRetry,
+}: ChatProps) {
   return (
     <div className="chat">
       <header className="chat__header">
         <h1>PrimeHomes Realty</h1>
-        <p className="chat__subtitle">Digital receptionist</p>
+        <p className="chat__subtitle">Your digital property assistant</p>
       </header>
 
       <div className="chat__body">
         <MessageList messages={messages} />
-        {status === 'sending' && <Loading label="Sending…" />}
+        {(status === 'sending' || status === 'receiving') && (
+          <Loading label="Thinking…" />
+        )}
         {status === 'error' && (
           <div className="chat__error" role="alert">
-            Message could not be sent.{' '}
+            {errorMessage || 'Message could not be sent.'}{' '}
             {onRetry && (
               <button type="button" onClick={onRetry}>
                 Try again
@@ -35,7 +44,7 @@ export default function Chat({ messages, status, onSend, onRetry }: ChatProps) {
       </div>
 
       <MessageInput
-        disabled={status === 'sending'}
+        disabled={status === 'sending' || status === 'receiving'}
         onSend={onSend}
       />
     </div>
